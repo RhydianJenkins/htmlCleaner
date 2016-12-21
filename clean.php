@@ -1,9 +1,8 @@
 <?php
 
-// Select the root, and all files
-// Note, must be a directory and does not do sub directories
+// Get which dir to clean from argv
 if (empty($argv[1])) {
-    die('No directory given. Exiting...' . PHP_EOL);
+    die('No directory given. Usage: "php clean.php <DIR_NAME>"' . PHP_EOL);
 } elseif (!is_dir($argv[1])) {
     die($argv[1] . ' is not a directory. Exiting...' . PHP_EOL);
 } else {
@@ -15,17 +14,27 @@ $cleanedFiles = array();
 
 // Clean and save all .htm files in given path
 foreach(glob($dir . '*.htm') as $file) {
-    $cleanedFiles[$file] = clean($file);
+    $html = file_get_contents($file);
+    $cleanedHtml = clean($html);
+    if ($html != $cleanedHtml) {
+        $cleanedFiles[$file] = $cleanedHtml;
+        echo 'Cleaned ' . $file . PHP_EOL;
+    }
 }
 
 // Clean and save all .html files in given path
 foreach(glob($dir . '*.html') as $file) {
-    $cleanedFiles[$file] = clean($file);
+    $html = file_get_contents($file);
+    $cleanedHtml = clean($html);
+    if ($html != $cleanedHtml) {
+        $cleanedFiles[$file] = $cleanedHtml;
+        echo 'Cleaned ' . $file . PHP_EOL;
+    }
 }
 
 // Check if any files have been cleaned
 if (empty($cleanedFiles)) {
-    die('No .htm or .html files found to clean.' . PHP_EOL);
+    die('No .htm or .html files found that needed cleaning.' . PHP_EOL);
 }
 
 // If the user didnt want to save the files, exit without saving
@@ -39,10 +48,7 @@ save($cleanedFiles);
 /**
  * Cleans a given file and returns the cleaned html
  */
-function clean($filename) {
-    // load html
-    $html = file_get_contents($filename);
-
+function clean($html) {
     // create a new DomDocument object
     $doc = new DOMDocument();
 
@@ -60,9 +66,6 @@ function clean($filename) {
     // remove inline styles
     $cleanHtml = $doc->saveHtml();
     $cleanHtml = preg_replace('/(<[^>]+) style=".*?"/i', '$1', $cleanHtml);
-
-    // Echo out user info
-    echo 'Cleaned ' . $filename . PHP_EOL;
 
     // Return cleaned html
     return $cleanHtml;
