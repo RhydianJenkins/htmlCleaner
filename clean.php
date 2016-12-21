@@ -8,13 +8,28 @@ if (empty($argv[1]) || !is_dir($argv[1])) {
     $dir = $argv[1];
 }
 
-// Clean and save all .html files in given path
+// Init empty array of files to save
+$cleanedFiles = array();
+
+// Clean and save all .htm files in given path
 foreach(glob($dir . '*.htm') as $file) {
-    cleanAndSave($file);
-    echo 'Cleaned ' . $file . PHP_EOL;
+    $cleanedFiles[$file] = clean($file);
 }
 
-function cleanAndSave($filename) {
+// Clean and save all .html files in given path
+foreach(glob($dir . '*.html') as $file) {
+    $cleanedFiles[$file] = clean($file);
+}
+
+// If the user didnt want to save the files, exit without saving
+if (strtolower(readline('Save cleaned files? [y/n]: ')) != 'y') {
+    die('Changes have not been saved.' . PHP_EOL);
+}
+
+// Save the changes
+save($cleanedFiles);
+
+function clean($filename) {
     // load html
     $html = file_get_contents($filename);
 
@@ -29,14 +44,16 @@ function cleanAndSave($filename) {
     // remove the script and style elements
     removeElement('script', $doc);
     removeElement('style', $doc);
-    removeElement('class', $doc);
 
     // remove inline styles
     $cleanHtml = $doc->saveHtml();
     $cleanHtml = preg_replace('/(<[^>]+) style=".*?"/i', '$1', $cleanHtml);
 
-    // save cleaned html
-    file_put_contents($filename, $cleanHtml);
+    // Echo out user info
+    echo 'Cleaned ' . $filename . PHP_EOL;
+
+    // Return cleaned html
+    return $cleanHtml;
 }
 
 function removeElement($tag, $doc) {
@@ -45,4 +62,16 @@ function removeElement($tag, $doc) {
         $node = $nodeList->item($nodeIdx);
         $node->parentNode->removeChild($node);
     }
+}
+
+/**
+ * Takes in array as [$filePath => $fileContents] structure
+ */
+function save(array $filesToSave) {
+    foreach ($filesToSave as $filePath => $fileContents) {
+        file_put_contents($filePath, $fileContents);
+    }
+
+    // Echo out user info
+    echo 'Files saved.' . PHP_EOL;
 }
