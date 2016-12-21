@@ -2,8 +2,10 @@
 
 // Select the root, and all files
 // Note, must be a directory and does not do sub directories
-if (empty($argv[1]) || !is_dir($argv[1])) {
+if (empty($argv[1])) {
     die('No directory given. Exiting...' . PHP_EOL);
+} elseif (!is_dir($argv[1])) {
+    die($argv[1] . ' is not a directory. Exiting...' . PHP_EOL);
 } else {
     $dir = $argv[1];
 }
@@ -39,6 +41,8 @@ function clean($filename) {
     // load the HTML into the DomDocument object (this would be your source HTML)
     libxml_use_internal_errors(true);
     $doc->loadHTML($html);
+    $doc->formatOutput = true;
+    $doc->preserveWhitespace = false;
     libxml_use_internal_errors(false);
 
     // remove the script and style elements
@@ -56,6 +60,9 @@ function clean($filename) {
     return $cleanHtml;
 }
 
+/**
+ * Removes the string $tag element from the DOMDocument $doc
+ */
 function removeElement($tag, $doc) {
     $nodeList = $doc->getElementsByTagName($tag);
     for ($nodeIdx = $nodeList->length; --$nodeIdx >= 0; ) {
@@ -68,6 +75,9 @@ function removeElement($tag, $doc) {
  * Takes in array as [$filePath => $fileContents] structure
  */
 function save(array $filesToSave) {
+    if (empty($filesToSave)) {
+        echo 'No files to save.' . PHP_EOL;
+    }
     foreach ($filesToSave as $filePath => $fileContents) {
         file_put_contents($filePath, $fileContents);
     }
