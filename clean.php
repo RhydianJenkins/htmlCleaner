@@ -1,21 +1,40 @@
 <?php
 
-// load html
-$html = file_get_contents('./htmltest.html');
+// Select the root, and all files
+// Note, must be a directory and does not do sub directories
+if (empty($argv[1]) || !is_dir($argv[1])) {
+    die('No directory given. Exiting...' . PHP_EOL);
+} else {
+    $dir = $argv[1];
+}
 
-// create a new DomDocument object
-$doc = new DOMDocument();
+// Clean and save all .html files in given path
+foreach(glob($dir . '*.html') as $file) {
+    cleanAndSave($file);
+    echo 'Cleaned ' . $file . PHP_EOL;
+}
 
-// load the HTML into the DomDocument object (this would be your source HTML)
-$doc->loadHTML($html);
+function cleanAndSave($filename) {
+    // load html
+    $html = file_get_contents($filename);
 
-removeElement('script', $doc);
-removeElement('style', $doc);
+    // create a new DomDocument object
+    $doc = new DOMDocument();
 
-// save cleaned html
-$cleanHtml = $doc->saveHtml();
-$cleanHtml = preg_replace('/(<[^>]+) style=".*?"/i', '$1', $cleanHtml);
-file_put_contents('./htmltest.html', $cleanHtml);
+    // load the HTML into the DomDocument object (this would be your source HTML)
+    $doc->loadHTML($html);
+
+    // remove the script and style elements
+    removeElement('script', $doc);
+    removeElement('style', $doc);
+
+    // remove inline styles
+    $cleanHtml = $doc->saveHtml();
+    $cleanHtml = preg_replace('/(<[^>]+) style=".*?"/i', '$1', $cleanHtml);
+
+    // save cleaned html
+    file_put_contents($filename, $cleanHtml);
+}
 
 function removeElement($tag, $doc) {
     $nodeList = $doc->getElementsByTagName($tag);
