@@ -23,6 +23,11 @@ foreach(glob($dir . '*.html') as $file) {
     $cleanedFiles[$file] = clean($file);
 }
 
+// Check if any files have been cleaned
+if (empty($cleanedFiles)) {
+    die('No .htm or .html files found to clean.' . PHP_EOL);
+}
+
 // If the user didnt want to save the files, exit without saving
 if (strtolower(readline('Save cleaned files? [y/n]: ')) != 'y') {
     die('Changes have not been saved.' . PHP_EOL);
@@ -78,9 +83,6 @@ function removeElement($tag, $doc) {
  * Takes in array as [$filePath => $fileContents] structure
  */
 function save(array $filesToSave) {
-    if (empty($filesToSave)) {
-        echo 'No files to save.' . PHP_EOL;
-    }
     foreach ($filesToSave as $filePath => $fileContents) {
         file_put_contents($filePath, $fileContents);
     }
