@@ -31,6 +31,9 @@ if (strtolower(readline('Save cleaned files? [y/n]: ')) != 'y') {
 // Save the changes
 save($cleanedFiles);
 
+/**
+ * Cleans a given file and returns the cleaned html
+ */
 function clean($filename) {
     // load html
     $html = file_get_contents($filename);
