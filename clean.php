@@ -9,7 +9,7 @@ if (empty($argv[1]) || !is_dir($argv[1])) {
 }
 
 // Clean and save all .html files in given path
-foreach(glob($dir . '*.html') as $file) {
+foreach(glob($dir . '*.htm') as $file) {
     cleanAndSave($file);
     echo 'Cleaned ' . $file . PHP_EOL;
 }
@@ -22,11 +22,14 @@ function cleanAndSave($filename) {
     $doc = new DOMDocument();
 
     // load the HTML into the DomDocument object (this would be your source HTML)
+    libxml_use_internal_errors(true);
     $doc->loadHTML($html);
+    libxml_use_internal_errors(false);
 
     // remove the script and style elements
     removeElement('script', $doc);
     removeElement('style', $doc);
+    removeElement('class', $doc);
 
     // remove inline styles
     $cleanHtml = $doc->saveHtml();
