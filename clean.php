@@ -19,7 +19,7 @@ if ($argc == 0  || empty($argv[$argc-1])) {
 
 // Init empty array of files to save
 $cleanedFiles = array();
-var_dump($dir);die;
+
 // Clean and save all .htm files in given path
 foreach(glob($dir . '*.htm') as $file) {
     $html = file_get_contents($file);
