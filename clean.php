@@ -1,17 +1,25 @@
 <?php
 
+// Get user options
+$shortOpts = 'a::'; // auto save - optional
+$options = getopt($shortOpts);
+
 // Get which dir to clean from argv
-if (empty($argv[1])) {
-    die('No directory given. Usage: "php clean.php <DIR_NAME>"' . PHP_EOL);
-} elseif (!is_dir($argv[1])) {
-    die($argv[1] . ' is not a directory. Exiting...' . PHP_EOL);
+if ($argc == 0  || empty($argv[$argc-1])) {
+    die('No directory given. Usage: "php clean.php [OPTIONS] <DIR_NAME>"' . PHP_EOL);
+} elseif (!is_dir($argv[$argc-1])) {
+    die($argv[$argc-1] . ' is not a directory. Exiting...' . PHP_EOL);
 } else {
-    $dir = $argv[1];
+    $dir = $argv[$argc-1];
+    // amend '/' to end of $dir if it isnt there already
+    if (substr($dir, -1) != '/') {
+        $dir .= '/';
+    }
 }
 
 // Init empty array of files to save
 $cleanedFiles = array();
-
+var_dump($dir);die;
 // Clean and save all .htm files in given path
 foreach(glob($dir . '*.htm') as $file) {
     $html = file_get_contents($file);
@@ -37,9 +45,12 @@ if (empty($cleanedFiles)) {
     die('No .htm or .html files found that needed cleaning.' . PHP_EOL);
 }
 
-// If the user didnt want to save the files, exit without saving
-if (strtolower(readline('Save cleaned files? [y/n]: ')) != 'y') {
-    die('Changes have not been saved.' . PHP_EOL);
+// If the user didnt want auto save
+if (!isset($options['a'])) {
+    // If the user didnt want to save the files, exit without saving
+    if (strtolower(readline('Save cleaned files? [y/n]: ')) != 'y') {
+        die('Changes have not been saved.' . PHP_EOL);
+    }
 }
 
 // Save the changes
