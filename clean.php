@@ -48,9 +48,16 @@ if (empty($cleanedFiles)) {
 // If the user didnt want auto save
 if (!isset($options['a'])) {
     // If the user didnt want to save the files, exit without saving
-    if (strtolower(readline('Save cleaned files? [y/n]: ')) != 'y') {
-        die('Changes have not been saved.' . PHP_EOL);
-    }
+	if (PHP_OS == 'WINNT') {
+		echo "[W] Save cleaned files? [y/n]: ";
+		if (strtolower(stream_get_line(STDIN, 1024, PHP_EOL)) != 'y') {
+			die('Changes have not been saved.' . PHP_EOL);
+		}
+	} else {
+		if (strtolower(readline('Save cleaned files? [y/n]: ')) != 'y') {
+			die('Changes have not been saved.' . PHP_EOL);
+		}	
+	}
 }
 
 // Save the changes
